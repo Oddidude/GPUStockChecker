@@ -1,7 +1,8 @@
 const puppeter = require("puppeteer");
 const open = require("open");
 
-const sitesJson = require("./websites.json");
+const config = require("./config.json");
+const sitesJson = require(config.website_file);
 
 // Converts JSON to array of objects for map function
 let jsonToArray = (json) => {
@@ -43,10 +44,14 @@ let checkPage = async (browser, url, element) => {
   const sites = jsonToArray(sitesJson);
 
   // Create new browser instance
-  const browser = await puppeter.launch({ 
-    headless  : true,
-    slowMo    : 0
-  });
+  if (config.debug) {
+    var browser = await puppeter.launch({ 
+      headless  : config.headless,
+      slowMo    : config.slowMo
+    });
+  } else {
+    var browser = await puppeter.launch();
+  }
 
   await Promise.allSettled(sites.map(x => {
     return checkPage(browser, x.url, x.element);

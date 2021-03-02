@@ -3,9 +3,12 @@
 
   "tracked_sites" : "./config/tracked_sites.json",
 
-  "debug"         : false,
+  "debug"         : true,
   "headless"      : true,
   "slowMo"        : 0,
+
+  "load_timeout"   : 0,
+  "waitUntil"     : "networkidle0",
 
   "page_timeout"  : 30000
 }

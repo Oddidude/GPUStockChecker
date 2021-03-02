@@ -6,7 +6,9 @@ const sitesJson = require(config.website_file);
 
 // Converts JSON to array of objects for map function
 let jsonToArray = (json) => {
+  // Main website data
   let arr = [];
+  // Keeps track of last time each link was opened
   let lastOpened = {};
 
   for (let key in json) {
@@ -28,7 +30,8 @@ let checkPage = async (browser, url, element) => {
     waitUntil: 'networkidle0'
   });
   
-  let check = await page.evaluate((element) => { 
+  let check = await page.evaluate((element) => {
+    // Check if availability element is present on screen
     let el = document.querySelector(element); 
     return (el != null);
   }, element);
@@ -41,7 +44,7 @@ let checkPage = async (browser, url, element) => {
   if (check)
     return Promise.resolve(url);
   else
-    return Promise.reject("Oos");
+    return Promise.reject("Out of Stock");
 };
 
 //Main
@@ -69,8 +72,10 @@ let checkPage = async (browser, url, element) => {
       promises.forEach((site) => {
         if (site.status == "fulfilled") {
           let currentTime = new Date().getTime();
+          // Check page was last opened MORE than 30 seconds ago
           if (currentTime - lastOpened[site.value] > 30000) {
             open(site.value);
+            // Refresh time of last time page was opened
             lastOpened[site.value] = currentTime;
           } else {
             if (config.debug) {
@@ -84,5 +89,4 @@ let checkPage = async (browser, url, element) => {
 
   // It shouldn't get here
   await browser.close();
-  console.log("SUCCESS!");
 })();

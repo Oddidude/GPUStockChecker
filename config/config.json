@@ -15,6 +15,6 @@
     "waitUntil" : "networkidle0"
   },
 
-  "debug"        : true,
+  "debug"        : false,
   "page_timeout" : 30000
 }

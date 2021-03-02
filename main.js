@@ -1,47 +1,54 @@
 const puppeter = require("puppeteer");
 
-/*
-  Load desired page
-
-  Opens new tab and waits till page is FULLY loaded before returning
-*/
-let visitPage = async (browser, url) => {
-  const page = await browser.newPage();
-  await page.goto(url, {
-    waitUntil : "networkidle0"
-  });
-  return page;
+let sitesJson = {
+  "https://www.google.com"  : ".lnXdpd",
+  "https://www.bbc.co.uk"   : ".e9p57e2"
 };
 
-/*
-  Visits _____ website and does checks
-*/
-let firstSite = async (browser) => {
-  const url = "https://www.google.com";
+let jsonToArray = (json) => {
+  let arr = [];
 
-  let page = await visitPage(browser, url);
-}
+  for (let key in json) {
+    arr.push({ 
+      url : key,
+      element : json[key]
+    });
+  };
 
-/*
-  Visits _____ website and does checks
-*/
-let secondSite = async (browser) => {
-  const url = "https://www.bbc.co.uk";
+  return arr;
+};
 
-  let page = await visitPage(browser, url);
-}
+let checkPage = async (browser, url, element) => {
+  const page = await browser.newPage();
+  await page.goto(url, { 
+    waitUntil: 'networkidle0'
+  });
+  
+  let check = await page.evaluate((element) => { 
+    let el = document.querySelector(element); 
+    return (el != null);
+  }, element);
+
+  console.log(element, ":", check)
+
+  return Promise.resolve(check);
+};
 
 /*
   Main
 */
 (async () => {
+  let sites = jsonToArray(sitesJson);
+
   // Create new browser instance
   const browser = await puppeter.launch({ 
-    headless  : false,
+    headless  : true,
     slowMo    : 0
   });
 
-  await Promise.allSettled([firstSite(browser), secondSite(browser)]);
+  let promises = await Promise.allSettled(sites.map(x => {
+    return checkPage(browser, x.url, x.element);
+  }));
 
   // Close browser
   await browser.close();

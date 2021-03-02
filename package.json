@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "open": "^8.0.1",
+    "puppeteer": "^8.0.0"
+  }
+}

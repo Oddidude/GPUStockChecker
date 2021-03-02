@@ -1,7 +1,10 @@
 const puppeter = require("puppeteer");
+const open = require("open");
 
 let sitesJson = {
   "https://www.google.com"  : ".lnXdpd",
+  "https://www.google.com/"  : "no",
+  //"https://www.google.com"  : "don\'t open",
   "https://www.bbc.co.uk"   : ".e9p57e2"
 };
 
@@ -31,13 +34,18 @@ let checkPage = async (browser, url, element) => {
 
   console.log(element, ":", check)
 
-  return Promise.resolve(check);
+  if (check) {
+    return Promise.resolve(url);
+  } else {
+    return Promise.reject("Oos");
+  }
 };
 
 /*
   Main
 */
 (async () => {
+
   let sites = jsonToArray(sitesJson);
 
   // Create new browser instance
@@ -46,9 +54,15 @@ let checkPage = async (browser, url, element) => {
     slowMo    : 0
   });
 
-  let promises = await Promise.allSettled(sites.map(x => {
+  await Promise.allSettled(sites.map(x => {
     return checkPage(browser, x.url, x.element);
-  }));
+  })).then((promises) => {
+    console.log(promises);
+    promises.forEach((site) => {
+      if (site.value != null)
+        open(site.value);
+    });
+  });
 
   // Close browser
   await browser.close();

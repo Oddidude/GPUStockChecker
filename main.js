@@ -7,15 +7,18 @@ const sitesJson = require(config.website_file);
 // Converts JSON to array of objects for map function
 let jsonToArray = (json) => {
   let arr = [];
+  let lastOpened = {};
 
   for (let key in json) {
     arr.push({ 
       url : key,
       element : json[key]
     });
+
+    lastOpened[key] = 0;
   };
 
-  return arr;
+  return [arr, lastOpened];
 };
 
 // Try and find the available button on the webpage and return true if clickable
@@ -30,7 +33,10 @@ let checkPage = async (browser, url, element) => {
     return (el != null);
   }, element);
 
-  console.log(element, ":", check)
+  if (config.debug)
+    console.log(element, ":", check)
+
+  page.close();
 
   if (check)
     return Promise.resolve(url);
@@ -40,8 +46,8 @@ let checkPage = async (browser, url, element) => {
 
 //Main
 (async () => {
-
-  const sites = jsonToArray(sitesJson);
+  // Convert website JSON list to array
+  let [sites, lastOpened] = jsonToArray(sitesJson);
 
   // Create new browser instance
   if (config.debug) {
@@ -53,17 +59,30 @@ let checkPage = async (browser, url, element) => {
     var browser = await puppeter.launch();
   }
 
-  await Promise.allSettled(sites.map(x => {
-    return checkPage(browser, x.url, x.element);
-  })).then((promises) => {
-    console.log(promises);
-    promises.forEach((site) => {
-      if (site.status == "fulfilled")
-        open(site.value);
-    });
-  });
+  while (true) {
+    await Promise.allSettled(sites.map(x => {
+      return checkPage(browser, x.url, x.element);
+    })).then((promises) => {
+      if (config.debug)
+        console.log(promises);
 
-  // Close browser
+      promises.forEach((site) => {
+        if (site.status == "fulfilled") {
+          let currentTime = new Date().getTime();
+          if (currentTime - lastOpened[site.value] > 30000) {
+            open(site.value);
+            lastOpened[site.value] = currentTime;
+          } else {
+            if (config.debug) {
+              console.log(site.value, "last opened:", currentTime - lastOpened[site.value], "ms ago");
+            }
+          }
+        }
+      });
+    });
+  };
+
+  // It shouldn't get here
   await browser.close();
   console.log("SUCCESS!");
 })();

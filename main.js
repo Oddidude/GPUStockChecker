@@ -20,7 +20,7 @@ let getUrls = () => {
     let fullUrl, url;
 
     if (config.debug)
-      console.log("Processing URL", val, "...");
+      console.log("Processing URL " + val + "...");
 
     // Adjust link depending on it it contains the http/https prefix
     if (httpsPrefix.test(val)) {
@@ -42,7 +42,7 @@ let getUrls = () => {
     // Get domain name from url to check against tracked sites
     let domain = psl.get(url);
     if (config.debug)
-      console.log("Got ", domain, "from", url);
+      console.log("Got " + domain + " from " + url);
 
     // Check if domain name found in tracked sites
     if (trackedSites.hasOwnProperty(domain)) {
@@ -54,13 +54,13 @@ let getUrls = () => {
       lastOpened[fullUrl] = 0;
     } else {
       if (config.debug)
-        console.log("URL", url, "not found in list of tracked URLs");
+        console.log("URL " + url + " not found in list of tracked URLs");
     }
   };
 
   if (config.debug) {
-    console.log("urls:",urls);
-    console.log("lastOpened:", lastOpened);
+    console.log("urls: " + urls);
+    console.log("lastOpened: " + lastOpened);
   }
   return [urls, lastOpened];
 };
@@ -69,9 +69,10 @@ let getUrls = () => {
 let checkPage = async (browser, url, element) => {
   const page = await browser.newPage();
   if (config.debug)
-    console.log("Loading page", url);
+    console.log("Initialising page " + url + "...");
   await page.goto(url, { 
-    waitUntil: 'networkidle0'
+    timeout   : 0,
+    waitUntil : 'networkidle0'
   });
   
   let check = await page.evaluate((element) => {
@@ -81,14 +82,14 @@ let checkPage = async (browser, url, element) => {
   }, element);
 
   if (config.debug)
-    console.log("Trying to find element", element, "...", (check ? "Success" : "Failed"));
+    console.log("Trying to find element " + element + "..." + (check ? "Success" : "Failed"));
 
   page.close();
 
   if (check)
     return Promise.resolve(url);
   else
-    return Promise.reject("Out of Stock");
+    return Promise.reject(url);
 };
 
 //Main
@@ -112,7 +113,7 @@ let checkPage = async (browser, url, element) => {
   }
 
   while (true) {
-    await Promise.allSettled(sites.map(x => {
+    await Promise.all(sites.map(x => {
       return checkPage(browser, x.url, x.element);
     })).then((promises) => {
       if (config.debug)
@@ -128,12 +129,13 @@ let checkPage = async (browser, url, element) => {
             lastOpened[site.value] = currentTime;
           } else {
             if (config.debug) {
-              console.log(site.value, "last opened:", currentTime - lastOpened[site.value], "ms ago");
+              console.log(site.value + " last opened: " + currentTime - lastOpened[site.value] + "ms ago");
             }
           }
         }
-      });
-    });
+      })
+    })
+    .catch((promises) => { console.log(promises); })
   };
 
   // It shouldn't get here

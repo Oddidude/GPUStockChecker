@@ -14,6 +14,16 @@ let visitPage = async (browser, url) => {
 };
 
 /*
+  Visits _____ website and does checks
+*/
+
+let firstSite = async (browser) => {
+  const url = "https://www.google.com";
+
+  let page = await visitPage(browser, url);
+}
+
+/*
   Main
 */
 (async () => {
@@ -23,9 +33,7 @@ let visitPage = async (browser, url) => {
     slowMo    : 0
   });
 
-  const url = "https://www.google.com";
-
-  await visitPage(browser, url);
+  await firstSite(browser);
 
   // Close browser
   await browser.close();

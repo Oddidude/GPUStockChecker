@@ -3,8 +3,10 @@ const open = require("open");
 const psl = require("psl");
 
 const config = require("./config/config.json");
-const trackedSites = require(config.tracked_sites);
-const sitesJson = require(config.website_file);
+const trackedSites = require(config.websites.tracked_sites);
+const sitesJson = require(config.websites.website_file);
+
+const debug = config.debug;
 
 // Converts JSON to array of objects for map function
 let getUrls = () => {
@@ -17,7 +19,7 @@ let getUrls = () => {
     const httpPrefix = /^(http:\/\/)/;
     let url, domain_name;
 
-    if (config.debug)
+    if (debug)
       console.log("Processing URL " + val + "...");
 
     // Formatting link depending on if it contains the http/https prefix
@@ -39,7 +41,7 @@ let getUrls = () => {
 
     // Get domain name from url to check against tracked sites
     let domain = psl.get(domain_name);
-    if (config.debug)
+    if (debug)
       console.log("Got " + domain + " from " + domain_name);
 
     // Check if domain name found in tracked sites
@@ -49,12 +51,12 @@ let getUrls = () => {
         "element" : trackedSites[domain]
       });
     } else {
-      if (config.debug)
+      if (debug)
         console.log("URL " + domain_name + " not found in list of tracked URLs");
     }
   };
 
-  if (config.debug)
+  if (debug)
     console.log("urls: " + urls);
   return urls;
 };
@@ -64,17 +66,11 @@ let checkPage = async (browser, url, element) => {
   // Page refresh timeout
   let lastOpened = 0;
 
-  // Page load options set in config file
-  const load_options = {
-    timeout   : config.load_timeout,
-    waitUntil : config.waitUntil
-  };
-
   // Open a new tab and load the URL
   const page = await browser.newPage();
-  if (config.debug)
+  if (debug)
     console.log("Initialising page " + url + "...");
-  await page.goto(url, load_options);
+  await page.goto(url, config.page_load_options);
   
   while (true) {
     let check = await page.evaluate((element) => {
@@ -83,7 +79,7 @@ let checkPage = async (browser, url, element) => {
       return (el != null);
     }, element);
 
-    if (config.debug)
+    if (debug)
       console.log("Trying to find element " + element + "..." + (check ? "Success" : "Failed"));
 
     // If buy button is available
@@ -95,17 +91,17 @@ let checkPage = async (browser, url, element) => {
         // Update most recent page open time
         lastOpened = currentTime;
       } else {
-        if (config.debug) {
+        if (debug) {
           console.log(site.value + " last opened: " + currentTime - lastOpened[site.value] + "ms ago");
         }
       }
     }
 
-    if (config.debug)
+    if (debug)
       console.log("Reloading page " + url + "...");
 
     // Reload the page and pray again
-    await page.reload(load_options);
+    await page.reload(config.page_load_options);
   }
 
   // Shouldn't get here
@@ -126,11 +122,8 @@ let checkPage = async (browser, url, element) => {
 
   // Set browser options according to config file
   let launch_options = {};
-  if (config.debug) {
-    launch_options = {
-      headless  : config.headless,
-      slowMo    : config.slowMo
-    };
+  if (debug) {
+    launch_options = config.browser_load_options;
   }
 
   // Create browser instance

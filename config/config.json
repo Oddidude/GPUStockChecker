@@ -1,14 +1,20 @@
 {
-  "website_file"  : "./config/websites/websites.json",
+  "websites" : {
+    "website_file"  : "./config/websites/websites.json",
 
-  "tracked_sites" : "./config/tracked_sites.json",
+    "tracked_sites" : "./config/tracked_sites.json"
+  },
 
-  "debug"         : true,
-  "headless"      : true,
-  "slowMo"        : 0,
+  "browser_load_options" : {
+    "headless" : true,
+    "slowMo"   : 0
+  },
 
-  "load_timeout"   : 0,
-  "waitUntil"     : "networkidle0",
+  "page_load_options" : {
+    "timeout"   : 0,
+    "waitUntil" : "networkidle0"
+  },
 
-  "page_timeout"  : 30000
+  "debug"        : true,
+  "page_timeout" : 30000
 }

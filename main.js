@@ -1,7 +1,7 @@
 const puppeter = require("puppeteer");
 const open = require("open");
 
-const config = require("./config.json");
+const config = require("./config/config.json");
 const sitesJson = require(config.website_file);
 
 // Converts JSON to array of objects for map function
@@ -73,7 +73,7 @@ let checkPage = async (browser, url, element) => {
         if (site.status == "fulfilled") {
           let currentTime = new Date().getTime();
           // Check page was last opened MORE than 30 seconds ago
-          if (currentTime - lastOpened[site.value] > 30000) {
+          if (currentTime - lastOpened[site.value] > config.page_timeout) {
             open(site.value);
             // Refresh time of last time page was opened
             lastOpened[site.value] = currentTime;

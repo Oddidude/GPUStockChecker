@@ -3,5 +3,7 @@
 
   "debug"         : false,
   "headless"      : true,
-  "slowMo"        : 0
+  "slowMo"        : 0,
+
+  "page_timeout"  : 30000
 }

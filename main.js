@@ -1,26 +1,43 @@
 const puppeter = require("puppeteer");
 const open = require("open");
+const psl = require("psl");
 
 const config = require("./config/config.json");
+const trackedSites = require(config.tracked_sites);
 const sitesJson = require(config.website_file);
 
 // Converts JSON to array of objects for map function
-let jsonToArray = (json) => {
+let getUrls = (json) => {
   // Main website data
-  let arr = [];
+  let urls = [];
   // Keeps track of last time each link was opened
   let lastOpened = {};
 
-  for (let key in json) {
-    arr.push({ 
-      url : key,
-      element : json[key]
-    });
+  for (let url of json["websites"]) {
+    let domain = psl.get(url);
+    if (config.debug)
+      console.log("Got ", domain, "from", url);
 
-    lastOpened[key] = 0;
+    let fullUrl = "https://" + url;
+
+    if (trackedSites.hasOwnProperty(domain)) {
+      urls.push({ 
+        "url" : fullUrl,
+        "element" : trackedSites[domain]
+      });
+
+      lastOpened[fullUrl] = 0;
+    } else {
+      if (config.debug)
+        console.log("URL", url, "not found in list of tracked URLs");
+    }
   };
 
-  return [arr, lastOpened];
+  if (config.debug) {
+    console.log("urls:",urls);
+    console.log("lastOpened:", lastOpened);
+  }
+  return [urls, lastOpened];
 };
 
 // Try and find the available button on the webpage and return true if clickable
@@ -37,7 +54,7 @@ let checkPage = async (browser, url, element) => {
   }, element);
 
   if (config.debug)
-    console.log(element, ":", check)
+    console.log(element, ":", check);
 
   page.close();
 
@@ -50,7 +67,7 @@ let checkPage = async (browser, url, element) => {
 //Main
 (async () => {
   // Convert website JSON list to array
-  let [sites, lastOpened] = jsonToArray(sitesJson);
+  let [sites, lastOpened] = getUrls(sitesJson);
 
   // Create new browser instance
   if (config.debug) {

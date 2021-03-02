@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "open": "^8.0.1",
+    "psl": "^1.8.0",
     "puppeteer": "^8.0.0"
   }
 }

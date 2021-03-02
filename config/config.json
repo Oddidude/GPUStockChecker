@@ -1,5 +1,7 @@
 {
-  "website_file"  : "./websites/websites.json",
+  "website_file"  : "./config/websites/websites.json",
+
+  "tracked_sites" : "./config/tracked_sites.json",
 
   "debug"         : false,
   "headless"      : true,

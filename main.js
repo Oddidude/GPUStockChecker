@@ -1,6 +1,19 @@
 const puppeter = require("puppeteer");
 
 /*
+  Load desired page
+
+  Opens new tab and waits till page is FULLY loaded before returning
+*/
+let visitPage = async (browser, url) => {
+  const page = await browser.newPage();
+  await page.goto(url, {
+    waitUntil : "networkidle0"
+  });
+  return page;
+};
+
+/*
   Main
 */
 (async () => {
@@ -10,9 +23,9 @@ const puppeter = require("puppeteer");
     slowMo    : 0
   });
 
-  const page = await browser.newPage();
+  const url = "https://www.google.com";
 
-  await page.goto("https://www.google.com");
+  await visitPage(browser, url);
 
   // Close browser
   await browser.close();

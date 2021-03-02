@@ -1,7 +1,13 @@
 {
   "websites" : [
-    "www.google.com",
-    "www.bbc.co.uk",
-    "www.example.com"
+    "https://www.currys.co.uk/gbuk/computing-accessories/components-upgrades/graphics-cards/asus-geforce-rtx-3070-8-gb-tuf-oc-gaming-graphics-card-10217338-pdt.html",
+    "https://www.currys.co.uk/gbuk/computing-accessories/components-upgrades/graphics-cards/msi-geforce-rtx-3070-8-gb-gaming-x-trio-graphics-card-10217077-pdt.html",
+    "https://www.currys.co.uk/gbuk/computing-accessories/components-upgrades/graphics-cards/asus-geforce-rtx-3070-8-gb-rog-strix-gaming-oc-graphics-card-10215770-pdt.html",
+    "https://www.currys.co.uk/gbuk/computing-accessories/components-upgrades/graphics-cards/gigabyte-geforce-rtx-3070-8-gb-eagle-oc-graphics-card-10216239-pdt.html",
+    "https://www.currys.co.uk/gbuk/computing-accessories/components-upgrades/graphics-cards/asus-geforce-rtx-3070-8-gb-dual-oc-graphics-card-10215776-pdt.html",
+    "https://www.currys.co.uk/gbuk/computing-accessories/components-upgrades/graphics-cards/gigabyte-geforce-rtx-3070-8-gb-vision-oc-graphics-card-10218742-pdt.html",
+    "https://www.currys.co.uk/gbuk/computing-accessories/components-upgrades/graphics-cards/msi-geforce-rtx-3070-8-gb-ventus-2x-oc-graphics-card-10217083-pdt.html",
+    "https://www.currys.co.uk/gbuk/computing-accessories/components-upgrades/graphics-cards/asus-geforce-rtx-3070-8-gb-dual-graphics-card-10215777-pdt.html",
+    "https://www.currys.co.uk/gbuk/computing-accessories/components-upgrades/graphics-cards/msi-geforce-rtx-3070-8-gb-ventus-3x-oc-graphics-card-10217078-pdt.html"
   ]
 }

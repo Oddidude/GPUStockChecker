@@ -13,14 +13,36 @@ let getUrls = () => {
   // Keeps track of last time each link was opened
   let lastOpened = {};
 
-  for (let url of sitesJson["websites"]) {
+  for (let val of sitesJson["websites"]) {
+    // URL used for finding webpage
+    const httpsPrefix = /^(https:\/\/)/;
+    const httpPrefix = /^(http:\/\/)/;
+    let fullUrl, url;
+
+    if (config.debug)
+      console.log("Processing URL", val, "...");
+
+    // Adjust link depending on it it contains the http/https prefix
+    if (httpsPrefix.test(val)) {
+      url = val.substring(8);
+      fullUrl = val;
+    } else if (httpPrefix.test(val)) {
+      url = val.substring(7);
+      fullUrl = val;
+    } else {
+      url = val;
+      fullUrl = "https://" + val;
+    }
+
+    let endOfDomain = url.indexOf("/");
+    if (endOfDomain != -1)
+      url = url.substring(0, endOfDomain);
+
+
     // Get domain name from url to check against tracked sites
     let domain = psl.get(url);
     if (config.debug)
       console.log("Got ", domain, "from", url);
-
-    // URL used for finding webpage
-    let fullUrl = "https://" + url;
 
     // Check if domain name found in tracked sites
     if (trackedSites.hasOwnProperty(domain)) {
@@ -46,6 +68,8 @@ let getUrls = () => {
 // Try and find the available button on the webpage and return true if clickable
 let checkPage = async (browser, url, element) => {
   const page = await browser.newPage();
+  if (config.debug)
+    console.log("Loading page", url);
   await page.goto(url, { 
     waitUntil: 'networkidle0'
   });
@@ -57,7 +81,7 @@ let checkPage = async (browser, url, element) => {
   }, element);
 
   if (config.debug)
-    console.log(element, ":", check);
+    console.log("Trying to find element", element, "...", (check ? "Success" : "Failed"));
 
   page.close();
 
@@ -71,6 +95,11 @@ let checkPage = async (browser, url, element) => {
 (async () => {
   // Convert website JSON list to array
   let [sites, lastOpened] = getUrls();
+
+  if (sites === undefined || sites.length === 0) {
+    console.log("Enter at least one valid website address");
+    return;
+  }
 
   // Create new browser instance
   if (config.debug) {

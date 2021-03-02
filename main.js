@@ -16,9 +16,17 @@ let visitPage = async (browser, url) => {
 /*
   Visits _____ website and does checks
 */
-
 let firstSite = async (browser) => {
   const url = "https://www.google.com";
+
+  let page = await visitPage(browser, url);
+}
+
+/*
+  Visits _____ website and does checks
+*/
+let secondSite = async (browser) => {
+  const url = "https://www.bbc.co.uk";
 
   let page = await visitPage(browser, url);
 }
@@ -33,7 +41,7 @@ let firstSite = async (browser) => {
     slowMo    : 0
   });
 
-  await firstSite(browser);
+  await Promise.allSettled([firstSite(browser), secondSite(browser)]);
 
   // Close browser
   await browser.close();

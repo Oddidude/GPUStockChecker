@@ -119,7 +119,7 @@ let checkPage = async (browser, url, element) => {
         console.log(promises);
 
       promises.forEach((site) => {
-        if (site.status == "fulfilled") {
+        if (site.status === "fulfilled") {
           let currentTime = new Date().getTime();
           // Check page was last opened MORE than 30 seconds ago
           if (currentTime - lastOpened[site.value] > config.page_timeout) {

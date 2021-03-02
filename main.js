@@ -1,13 +1,14 @@
 const puppeter = require("puppeteer");
 const open = require("open");
 
+// Temporary JSON for test sites
 let sitesJson = {
   "https://www.google.com"  : ".lnXdpd",
-  "https://www.google.com/"  : "no",
-  //"https://www.google.com"  : "don\'t open",
+  "https://www.google.com/"  : "don\'t open",
   "https://www.bbc.co.uk"   : ".e9p57e2"
 };
 
+// Converts JSON to array of objects for map function
 let jsonToArray = (json) => {
   let arr = [];
 
@@ -21,6 +22,7 @@ let jsonToArray = (json) => {
   return arr;
 };
 
+// Try and find the available button on the webpage and return true if clickable
 let checkPage = async (browser, url, element) => {
   const page = await browser.newPage();
   await page.goto(url, { 
@@ -34,19 +36,16 @@ let checkPage = async (browser, url, element) => {
 
   console.log(element, ":", check)
 
-  if (check) {
+  if (check)
     return Promise.resolve(url);
-  } else {
+  else
     return Promise.reject("Oos");
-  }
 };
 
-/*
-  Main
-*/
+//Main
 (async () => {
 
-  let sites = jsonToArray(sitesJson);
+  const sites = jsonToArray(sitesJson);
 
   // Create new browser instance
   const browser = await puppeter.launch({ 
@@ -59,7 +58,7 @@ let checkPage = async (browser, url, element) => {
   })).then((promises) => {
     console.log(promises);
     promises.forEach((site) => {
-      if (site.value != null)
+      if (site.status == "fulfilled")
         open(site.value);
     });
   });

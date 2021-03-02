@@ -56,8 +56,6 @@ let getUrls = () => {
     }
   };
 
-  if (debug)
-    console.log("urls: " + urls);
   return urls;
 };
 
@@ -92,7 +90,7 @@ let checkPage = async (browser, url, element) => {
         lastOpened = currentTime;
       } else {
         if (debug) {
-          console.log(site.value + " last opened: " + currentTime - lastOpened[site.value] + "ms ago");
+          console.log(url + " last opened: " + (currentTime - lastOpened) + "ms ago");
         }
       }
     }

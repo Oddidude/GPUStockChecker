@@ -1,5 +1,5 @@
 {
-  "website_file"  : "./websites.json",
+  "website_file"  : "./websites/websites.json",
 
   "debug"         : false,
   "headless"      : true,

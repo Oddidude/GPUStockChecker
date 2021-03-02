@@ -1,12 +1,7 @@
 const puppeter = require("puppeteer");
 const open = require("open");
 
-// Temporary JSON for test sites
-let sitesJson = {
-  "https://www.google.com"  : ".lnXdpd",
-  "https://www.google.com/"  : "don\'t open",
-  "https://www.bbc.co.uk"   : ".e9p57e2"
-};
+const sitesJson = require("./websites.json");
 
 // Converts JSON to array of objects for map function
 let jsonToArray = (json) => {

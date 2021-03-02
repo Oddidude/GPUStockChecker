@@ -7,19 +7,22 @@ const trackedSites = require(config.tracked_sites);
 const sitesJson = require(config.website_file);
 
 // Converts JSON to array of objects for map function
-let getUrls = (json) => {
+let getUrls = () => {
   // Main website data
   let urls = [];
   // Keeps track of last time each link was opened
   let lastOpened = {};
 
-  for (let url of json["websites"]) {
+  for (let url of sitesJson["websites"]) {
+    // Get domain name from url to check against tracked sites
     let domain = psl.get(url);
     if (config.debug)
       console.log("Got ", domain, "from", url);
 
+    // URL used for finding webpage
     let fullUrl = "https://" + url;
 
+    // Check if domain name found in tracked sites
     if (trackedSites.hasOwnProperty(domain)) {
       urls.push({ 
         "url" : fullUrl,
@@ -67,7 +70,7 @@ let checkPage = async (browser, url, element) => {
 //Main
 (async () => {
   // Convert website JSON list to array
-  let [sites, lastOpened] = getUrls(sitesJson);
+  let [sites, lastOpened] = getUrls();
 
   // Create new browser instance
   if (config.debug) {

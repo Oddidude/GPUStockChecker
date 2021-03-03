@@ -71,35 +71,42 @@ let checkPage = async (browser, url, element) => {
   await page.goto(url, config.page_load_options);
   
   while (true) {
-    let check = await page.evaluate((element) => {
-      // Check if availability element is present on screen
-      let el = document.querySelector(element); 
-      return (el != null);
-    }, element);
+    try {
+      let check = await page.evaluate((element) => {
+        // Check if availability element is present on screen
+        let el = document.querySelector(element); 
+        return (el != null);
+      }, element);
 
-    if (debug)
-      console.log("Trying to find element " + element + "..." + (check ? "Success" : "Failed"));
+      if (debug)
+        console.log("Trying to find element \"" + element + "\"..." + (check ? "Success" : "Failed"));
 
-    // If buy button is available
-    if (check) {
-      let currentTime = new Date().getTime();
-      // Check page was last opened MORE than 30 seconds ago
-      if (currentTime - lastOpened > config.page_timeout) {
-        open(url);
-        // Update most recent page open time
-        lastOpened = currentTime;
-      } else {
-        if (debug) {
-          console.log(url + " last opened: " + (currentTime - lastOpened) + "ms ago");
+      // If buy button is available
+      if (check) {
+        let currentTime = new Date().getTime();
+        // Check page was last opened MORE than 30 seconds ago
+        if (currentTime - lastOpened > config.page_timeout) {
+          open(url);
+          // Update most recent page open time
+          lastOpened = currentTime;
+
+          console.log("Found one! " + url);
+        } else {
+          if (debug) {
+            console.log(url + " last opened: " + (currentTime - lastOpened) + "ms ago");
+          }
         }
       }
+    } catch(err) {
+      console.log(err);
+    } finally {
+
+      if (debug)
+        console.log("Reloading page " + url + "...");
+
+      // Reload the page and pray again
+      await page.reload(config.page_load_options);
     }
-
-    if (debug)
-      console.log("Reloading page " + url + "...");
-
-    // Reload the page and pray again
-    await page.reload(config.page_load_options);
   }
 
   // Shouldn't get here
@@ -109,6 +116,8 @@ let checkPage = async (browser, url, element) => {
 
 // Main
 (async () => {
+  console.log("Starting Stock Checker...");
+
   // Convert website JSON list to array
   let sites = getUrls();
 
@@ -126,6 +135,8 @@ let checkPage = async (browser, url, element) => {
 
   // Create browser instance
   const browser = await puppeter.launch(launch_options);
+
+  console.log("Searching...");
 
   // Start all the page checks
   await Promise.all(sites.map(x => {

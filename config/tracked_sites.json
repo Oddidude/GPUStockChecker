@@ -1,7 +1,7 @@
 {
-  "currys.co.uk"        : "[data-component=\"add-to-basket-button-wrapper\"]",
-  "scan.co.uk"          : ".in.stock",
-  "amazon.co.uk"        : "#add-to-cart-button",
-  "novatech.co.uk"      : ".basket-button",
-  "cclonline.com"       : ".btnBuy"
+  "currys.co.uk"   : "[data-component=\"add-to-basket-button-wrapper\"]",
+  "scan.co.uk"     : ".in.stock",
+  "amazon.co.uk"   : "#add-to-cart-button",
+  "novatech.co.uk" : ".basket-button",
+  "cclonline.com"  : ".btnBuy"
 }

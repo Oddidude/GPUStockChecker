@@ -68,6 +68,17 @@ let checkPage = async (browser, url, element) => {
   const page = await browser.newPage();
   if (debug)
     console.log("Initialising page " + url + "...");
+
+  // Stop loading images, css and scripts
+  await page.setRequestInterception(true);
+  page.on('request', (req) => {
+    if (req.resourceType() == "stylesheet" || req.resourceType() == "font" || req.resourceType() == "image" || req.resourceType() == "script") {
+      req.abort();
+    } else {
+      req.continue();
+    }
+  });
+
   await page.goto(url, config.page_load_options);
   
   while (true) {
@@ -128,10 +139,7 @@ let checkPage = async (browser, url, element) => {
   }
 
   // Set browser options according to config file
-  let launch_options = {};
-  if (debug) {
-    launch_options = config.browser_load_options;
-  }
+  launch_options = config.browser_load_options;
 
   // Create browser instance
   const browser = await puppeter.launch(launch_options);

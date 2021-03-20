@@ -23,9 +23,13 @@ Run the project
 ## Configuration
 I've tried to make it as straightforward and easily customised as possible
 ### Setting up product links to be checked
-In the `config/websites/` directory you can add or remove links in the JSON file to change what URLs are checked. You can disable URLs but either removing them from the list completely or moving them into another object that ISN'T the `websites` object.
+In the `config/websites/` directory you can add or remove links by storing them in JSON files following the format of the example seen in `config/websites/websites.json`.
+You can name the files whatever you want to help with sorting as long as they're in the correct directory and are stored in a JSON with a member named `websites`.
+JSON members not named `websites` will be ignored allowing for easy URL disabling.
 ### Adding more domain names
-In the `config/` directory there is a JSON containing the distributor sites that are compatible with the checker. These work by matching the domain name of a product with one of the domains in `tracked_files.json` so that the checker knows what HTML element to look for in the page.
+In `config/websites/` you can also set up domain names to be checked and how to check them. These parameters are stored similarly to website URLs in JSON members named `siteInfo` with the format `domain name : HTML element on page to be checked`.
+This is a fairly basic approach for scraping the website and makes the process of adding new websites slightly more hands on but it works.
+Once again, JSON members not following the `siteInfo` name will be ignored.
 ### Config file
-There are some parameters in this file that let you choose which websites and tracked sites files to check so you can make multiple versions of these files and just select the ones you want to use. 
+There are some parameters in this file that let you choose which websites and tracked sites files to check so you can make multiple versions of these files and just select the directory that they are in.
 The rest of the config file just configures Puppeteer and the loading of web pages.

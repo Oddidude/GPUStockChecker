@@ -151,7 +151,7 @@ let checkPage = async (browser, url, element) => {
         }
       }
     } catch(err) {
-      console.log(err);
+      console.log("Something went wrong!", err);
     } finally {
 
       if (debug)
@@ -192,10 +192,11 @@ let checkPage = async (browser, url, element) => {
   // Create browser instance
   const browser = await puppeter.launch(launch_options);
 
-  console.log("Searching...");
+  console.log("Starting...");
 
   // Start all the page checks
   await Promise.all(sites.map(x => {
+    console.log("Searching " + x.url + "...");
     return checkPage(browser, x.url, x.element);
   }));
 

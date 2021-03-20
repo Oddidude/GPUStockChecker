@@ -1,9 +1,7 @@
 {
-  "websites" : {
-    "website_file"  : "./config/websites/websites.json",
-
-    "tracked_sites" : "./config/tracked_sites.json"
-  },
+  "websites"            : "config/websites",
+  "tracked_sites_json"  : "siteInfo",
+  "websites_json"       : "websites",
 
   "browser_load_options" : {
     "headless" : true,

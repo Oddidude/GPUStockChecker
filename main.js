@@ -1,22 +1,71 @@
 const puppeter = require("puppeteer");
 const open = require("open");
 const psl = require("psl");
+const fs = require("fs");
+const path = require("path");
 
 const config = require("./config/config.json");
-const trackedSites = require(config.websites.tracked_sites);
-const sitesJson = require(config.websites.website_file);
 
+// Grabbing some values from config file
+const tracked_sites_json = config.tracked_sites_json;
+const websites_json = config.websites_json;
 const debug = config.debug;
 
+// Gathers all the necessary data inside the directory set in config.websites
+let gatherResources = (currentDir, trackedSites={}, sitesList=[]) => {
+  let files = fs.readdirSync(currentDir);
+
+  // Go through each file in the current directory
+  files.forEach((file) => {
+    // Assemble directory/file path
+    let filePath = currentDir + "/" + file;
+    // If path is a directory then recurse, otherwise search for useful data
+    if (fs.statSync(filePath).isDirectory()) {
+      [trackedSites, sitesList] = gatherResources(filePath, trackedSites, sitesList);
+    } else {
+      if (path.extname(file) == ".json") {
+        try {
+          // Load the JSON in the file
+          let json = require("./" + filePath);
+
+          // If the file contains a member siteInfo then add all the data to the current list of tracked sites
+          if (tracked_sites_json in json)
+            trackedSites = { ...trackedSites, ...json[tracked_sites_json] };
+
+          // If the file contains a member websites then add the websites to the current list of websites
+          if (websites_json in json)
+            sitesList = sitesList.concat(json[websites_json]);
+        } catch (err) {
+          // If there's something wrong with the JSON file
+          if (debug)
+            console.log("Invalid JSON file: " + filePath);
+        }
+      } else {
+        // If the file being checked isn't a JSON file
+        if (debug)
+          console.log("Invalid website file: " + filePath);
+      }
+    }
+  });
+
+  if (debug) {
+    console.log("trackedSites =", trackedSites);
+    console.log("sitesList =", sitesList);
+  }
+
+  return [trackedSites, sitesList];
+};
+
 // Converts JSON to array of objects for map function
-let getUrls = () => {
+let getUrls = (trackedSites, sitesList) => {
   // Main website data
   let urls = [];
 
-  for (let val of sitesJson["websites"]) {
-    // Regex for parsing domain name
-    const httpsPrefix = /^(https:\/\/)/;
-    const httpPrefix = /^(http:\/\/)/;
+  // Regex for parsing domain name
+  const httpsPrefix = /^(https:\/\/)/;
+  const httpPrefix = /^(http:\/\/)/;
+
+  for (let val of sitesList) {
     let url, domain_name;
 
     if (debug)
@@ -36,23 +85,27 @@ let getUrls = () => {
 
     // Trimming domain name
     let endOfDomain = domain_name.indexOf("/");
-    if (endOfDomain != -1)
+    if (endOfDomain != -1) {
       domain_name = domain_name.substring(0, endOfDomain);
 
-    // Get domain name from url to check against tracked sites
-    let domain = psl.get(domain_name);
-    if (debug)
-      console.log("Got " + domain + " from " + domain_name);
+      // Get domain name from url to check against tracked sites
+      let domain = psl.get(domain_name);
+      if (debug)
+        console.log("Got " + domain + " from " + domain_name);
 
-    // Check if domain name found in tracked sites
-    if (trackedSites.hasOwnProperty(domain)) {
-      urls.push({ 
-        "url" : url,
-        "element" : trackedSites[domain]
-      });
+      // Check if domain name found in tracked sites
+      if (domain in trackedSites) {
+        urls.push({ 
+          "url" : url,
+          "element" : trackedSites[domain]
+        });
+      } else {
+        if (debug)
+          console.log("URL " + domain_name + " not found in list of tracked URLs");
+      }
     } else {
       if (debug)
-        console.log("URL " + domain_name + " not found in list of tracked URLs");
+        console.log("Invalid domain: " + domain_name);
     }
   };
 
@@ -118,8 +171,11 @@ let checkPage = async (browser, url, element) => {
 (async () => {
   console.log("Starting Stock Checker...");
 
+
+  let [trackedSites, sitesList] = gatherResources(config.websites);
+
   // Convert website JSON list to array
-  let sites = getUrls();
+  let sites = getUrls(trackedSites, sitesList);
 
   // Check that there is at least one array to work with
   if (sites === undefined || sites.length === 0) {
